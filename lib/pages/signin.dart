@@ -110,7 +110,7 @@ class _SignInState extends State<SignIn> {
                                           builder: (context) => ChatPage()));
                                 },
                                 // Navigate to signup page
-                                // Example: Navigator.push(context, MaterialPageRoute(builder: (context) => SignUp()));
+                                //  Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage()));
 
                                 child: Text("Sign Up"),
                               ),

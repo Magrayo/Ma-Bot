@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:chat_bot/pages/signin.dart';
 import 'package:chat_bot/pages/chatpage.dart';
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:chat_bot/pages/t.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,11 +17,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      //  initialRoute: '/', // Set initial route to '/'
-      // routes: {
-      //  '/': (context) => SignIn(), // Define the login page with route '/'
-      //  '/chat': (context) => ChatPage(),
-      //  },
+      home: SignIn(), // or initialRoute: '/signin'
+      routes: {
+        '/signin': (context) => SignIn(),
+        '/chatpage': (context) => ChatPage(),
+        // Add other routes here if needed
+      },
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -32,7 +37,6 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: ChatPage(),
     );
   }
 }

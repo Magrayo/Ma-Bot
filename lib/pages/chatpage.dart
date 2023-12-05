@@ -189,7 +189,7 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  void _handleSendPressed(types.PartialText message) {
+  void _handleSendPressed(types.PartialText message) async {
     final textMessage = types.TextMessage(
       author: _user,
       createdAt: DateTime.now().millisecondsSinceEpoch,
@@ -197,8 +197,72 @@ class _ChatPageState extends State<ChatPage> {
       text: message.text,
     );
 
-    _addMessage(textMessage);
+    setState(() {
+      _messages.insert(0, textMessage);
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2:8080/api'),
+        body: '{"input": "${message.text}"}',
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        print('Bot Response: $responseData'); // For debugging
+
+        final botMessage = types.TextMessage(
+          author: types.User(
+              id: 'bot_id'), // Replace 'bot_id' with the actual bot ID
+          createdAt: DateTime.now().millisecondsSinceEpoch,
+          id: const Uuid().v4(),
+          text: responseData.toString(), // Display the full response as text
+        );
+
+        setState(() {
+          _messages.insert(0, botMessage);
+        });
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e'); // For debugging
+      // Handle errors or exceptions from the API call
+    }
   }
+  //  Future<void> _handleSendPressed(types.PartialText message) async {
+  //   final textMessage = types.TextMessage(
+  //     author: _user,
+  //     createdAt: DateTime.now().millisecondsSinceEpoch,
+  //     id: const Uuid().v4(),
+  //     text: message.text,
+  //   );
+
+  //   _addMessage(textMessage);
+
+  //   try {
+  //     final response = await http.post(
+  //       Uri.parse('http://10.0.2.2:8080/api'),
+  //       body: '{"input": "${message.text}"}',
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       final responseData = json.decode(response.body);
+  //       final botMessage = types.TextMessage(
+  //         author: types.User(id: 'bot_id'), // Replace 'bot_id' with actual bot ID
+  //         createdAt: DateTime.now().millisecondsSinceEpoch,
+  //         id: const Uuid().v4(),
+  //         text: responseData['response'], // Assuming the bot response key is 'response'
+  //       );
+
+  //       _addMessage(botMessage);
+  //     } else {
+  //       throw Exception('Failed to load data');
+  //     }
+  //   } catch (e) {
+  //     // Handle errors or exceptions from the API call
+  //   }
+  // }
 
   void _loadMessages() async {
     final response = await rootBundle.loadString('assets/messages.json');
@@ -225,3 +289,72 @@ class _ChatPageState extends State<ChatPage> {
         ),
       );
 }
+
+//   void _handleSendPressed(types.PartialText message) {
+//     final textMessage = types.TextMessage(
+//       author: _user,
+//       createdAt: DateTime.now().millisecondsSinceEpoch,
+//       id: const Uuid().v4(),
+//       text: message.text,
+//     );
+
+//     _addMessage(textMessage);
+
+//     Future fetchData() async {
+//       String reqbody = '{"input": "miscarriage"}';
+//       final response =
+//           await http.post(Uri.parse('http://10.0.2.2:8080/api'), body: reqbody);
+
+//       if (response.statusCode == 200) {
+//         // If the server returns a 200 OK response, parse the JSON
+//         return json.decode(response.body);
+//       } else {
+//         // If the server did not return a 200 OK response,
+//         // throw an exception.
+//         throw Exception('Failed to load data');
+//       }
+//     }
+
+//     fetchData();
+//   }
+
+//   void _loadMessages() async {
+//     final response = await rootBundle.loadString('assets/messages.json');
+//     final messages = (jsonDecode(response) as List)
+//         .map((e) => types.Message.fromJson(e as Map<String, dynamic>))
+//         .toList();
+
+//     setState(() {
+//       _messages = messages;
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) => Scaffold(
+//         body: Chat(
+//           messages: _messages,
+//           onAttachmentPressed: _handleAttachmentPressed,
+//           onMessageTap: _handleMessageTap,
+//           onPreviewDataFetched: _handlePreviewDataFetched,
+//           onSendPressed: _handleSendPressed,
+//           showUserAvatars: true,
+//           showUserNames: true,
+//           user: _user,
+//         ),
+//         //body: Center(
+//         // child: FutureBuilder(
+//         //     future: fetchData(),
+//         //     builder: (context, snapshot) {
+//         //       if (snapshot.connectionState == ConnectionState.waiting) {
+//         //         return CircularProgressIndicator();
+//         //       } else if (snapshot.hasError) {
+//         //         return Text('Error: ${snapshot.error}');
+//         //       } else {
+//         //         // Display the data from the API
+//         //         return Text('Data from API: ${snapshot.data}');
+//         //       }
+//         //     },
+//         //   ),
+//         // ),
+//       );
+// }
